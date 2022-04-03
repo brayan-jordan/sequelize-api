@@ -68,7 +68,76 @@ class PessoaController {
                 }
             })
 
-            return res.status(200).json({ mensagem: `Id ${id} deletado com sucesso`})
+            return res.status(200).json({ mensagem: `Id ${id} deletado com sucesso` })
+        } catch (err) {
+            return res.status(500).json({ err: err.message })
+        }
+    }
+
+    static async pegaUmaMatricula(req, res) {
+        const { estudanteId, matriculaId } = req.params
+        try {
+            const umaMatricula = await database.Matriculas.findOne({
+                where: {
+                    id: matriculaId,
+                    estudante_id: estudanteId
+                }
+            })
+            return res.status(200).json(umaMatricula)
+        } catch (err) {
+            return res.status(500).json({ err: err.message })
+        }
+    }
+
+    static async criaMatricula(req, res) {
+        const { estudanteId } = req.params
+        const novaMatricula = { ...req.body, estudante_id: estudanteId }
+        try {
+            const createdNovaMatricula = await database.Matriculas.create(novaMatricula)
+            return res.status(200).json(createdNovaMatricula)
+        } catch (err) {
+            return res.status(500).json({ err: err.message })
+        }
+    }
+
+    static async atualizaMatricula(req, res) {
+        const { estudanteId, matriculaId } = req.params
+        const infosToEdit = req.body
+        try {
+            await database.Matriculas.update(
+                infosToEdit,
+                {
+                    where: {
+                        id: matriculaId,
+                        estudante_id: estudanteId
+                    }
+                }
+            )
+
+            const matricula = await database.Matriculas.findOne({
+                where: {
+                    id: matriculaId,
+                    estudante_id: estudanteId
+                }
+            })
+
+            return res.status(200).json(matricula)
+        } catch (err) {
+            return res.status(500).json({ err: err.message })
+        }
+    }
+
+    static async deletaMatricula(req, res) {
+        const { estudanteId, matriculaId } = req.params
+        try {
+            await database.Matriculas.destroy({
+                where: {
+                    id: matriculaId,
+                    estudante_id: estudanteId
+                }
+            })
+
+            return res.status(200).json({ mensagem: `Id ${id} deletado com sucesso` })
         } catch (err) {
             return res.status(500).json({ err: err.message })
         }
