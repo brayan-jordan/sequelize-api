@@ -1,9 +1,18 @@
 const database = require('../models')
 
 class PessoaController {
+    static async findAllPeoplesWhereActive(req, res) {
+        try {
+            const allActivesPeoples = await database.Pessoas.findAll()
+            return res.status(200).json(allPeoples)
+        } catch (err) {
+            return res.status(500).json({ message: err.message })
+        }
+    }
+
     static async findAllPeoples(req, res) {
         try {
-            const allPeoples = await database.Pessoas.findAll()
+            const allPeoples = await database.Pessoas.scope('todos').findAll()
             return res.status(200).json(allPeoples)
         } catch (err) {
             return res.status(500).json({ message: err.message })
@@ -69,6 +78,21 @@ class PessoaController {
             })
 
             return res.status(200).json({ mensagem: `Id ${id} deletado com sucesso` })
+        } catch (err) {
+            return res.status(500).json({ err: err.message })
+        }
+    }
+
+    static async restauraPessoa(req, res) {
+        const { id } = req.params
+        try {
+            await database.Pessoas.restore({
+                where: {
+                    id: id
+                }
+            })
+
+            return res.status(200).json({ mensagem: `Id ${id} restaurado com sucesso` })
         } catch (err) {
             return res.status(500).json({ err: err.message })
         }
